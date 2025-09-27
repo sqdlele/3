@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<h2>Профиль</h2>
+{% if profile.avatar %}
+    <img src="{{ profile.avatar.url }}" class="img-thumbnail mb-3" width="120" height="120">
+{% endif %}
+<ul class="list-group mb-3">
+    <li class="list-group-item"><b>Имя:</b> {{ profile.first_name }}</li>
+    <li class="list-group-item"><b>Фамилия:</b> {{ profile.last_name }}</li>
+    <li class="list-group-item"><b>Email:</b> {{ profile.user.email }}</li>
+    <li class="list-group-item"><b>Контакты:</b> {{ profile.contact_info }}</li>
+    <li class="list-group-item"><b>Роль:</b> {{ profile.get_role_display }}</li>
+</ul>
+<a href="{% url 'accounts:profile_edit' %}" class="btn btn-secondary">Редактировать</a>
+{% endblock %} 
