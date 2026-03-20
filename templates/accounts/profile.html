@@ -1,16 +1,57 @@
 {% extends 'base.html' %}
 {% block title %}Профиль{% endblock %}
 {% block content %}
-<h2>Профиль</h2>
-{% if profile.avatar %}
-    <img src="{{ profile.avatar.url }}" class="img-thumbnail mb-3" width="120" height="120">
-{% endif %}
-<ul class="list-group mb-3">
-    <li class="list-group-item"><b>Имя:</b> {{ profile.first_name }}</li>
-    <li class="list-group-item"><b>Фамилия:</b> {{ profile.last_name }}</li>
-    <li class="list-group-item"><b>Email:</b> {{ profile.user.email }}</li>
-    <li class="list-group-item"><b>Контакты:</b> {{ profile.contact_info }}</li>
-    <li class="list-group-item"><b>Роль:</b> {{ profile.get_role_display }}</li>
-</ul>
-<a href="{% url 'accounts:profile_edit' %}" class="btn btn-secondary">Редактировать</a>
+<div class="profile-header mb-3">
+    {% if profile.avatar %}
+        <img src="{{ profile.avatar.url }}" class="img-thumbnail profile-avatar" alt="Аватар">
+    {% else %}
+        <div class="profile-avatar profile-avatar-placeholder">{{ profile.user.username|first|upper }}</div>
+    {% endif %}
+    <div>
+        <h2 class="mb-3">{{ profile.user.username }}</h2>
+        <p class="text-muted profile-subline">Роль: {{ profile.get_role_display }}</p>
+        <p class="text-muted profile-subline">Дата регистрации: {{ profile.user.date_joined|date:'d.m.Y' }}</p>
+        {% if profile.user.last_login %}
+            <p class="text-muted profile-subline">Последний вход: {{ profile.user.last_login|date:'d.m.Y H:i' }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="profile-stats mb-3">
+    <div class="card"><div class="card-body"><p class="profile-stat-label">Опубликовано</p><p class="profile-stat-value">{{ published_count }}</p></div></div>
+    <div class="card"><div class="card-body"><p class="profile-stat-label">Черновики</p><p class="profile-stat-value">{{ drafts_count }}</p></div></div>
+    <div class="card"><div class="card-body"><p class="profile-stat-label">Просмотры</p><p class="profile-stat-value">{{ total_views }}</p></div></div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 class="mb-3">Личные данные</h4>
+        <ul class="list-group">
+            <li class="list-group-item"><b>Имя:</b> {{ profile.first_name|default:'—' }}</li>
+            <li class="list-group-item"><b>Фамилия:</b> {{ profile.last_name|default:'—' }}</li>
+            <li class="list-group-item"><b>Email:</b> {{ profile.user.email|default:'—' }}</li>
+            <li class="list-group-item"><b>Контакты:</b> {{ profile.contact_info|default:'—' }}</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 class="mb-3">Последние материалы</h4>
+        {% for article in recent_articles %}
+            <div class="profile-article-row">
+                <a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a>
+                <span class="text-muted">{{ article.pub_date|date:'d.m.Y H:i' }}</span>
+            </div>
+        {% empty %}
+            <div class="empty-state">У вас пока нет статей. Создайте первую публикацию.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="actions-row">
+    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Редактировать профиль</a>
+    <a href="{% url 'blog:article_create' %}" class="btn btn-success">Создать статью</a>
+    <a href="{% url 'blog:article_list' %}" class="btn btn-secondary">Перейти к статьям</a>
+</div>
 {% endblock %} 

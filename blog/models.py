@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 # Create your models here.
 
@@ -28,3 +29,28 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ArticleView(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='article_views')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['article', 'user'],
+                condition=Q(user__isnull=False),
+                name='unique_article_user_view',
+            ),
+            models.UniqueConstraint(
+                fields=['article', 'session_key'],
+                condition=Q(session_key__isnull=False),
+                name='unique_article_session_view',
+            ),
+        ]
+
+    def __str__(self):
+        viewer = self.user.username if self.user else self.session_key
+        return f'{self.article_id}:{viewer}'

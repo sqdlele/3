@@ -1,50 +1,59 @@
 {% extends 'base.html' %}
 {% block title %}Главная{% endblock %}
 {% block content %}
-<h2>Главная страница</h2>
-<form method="get" action="" class="mb-3">
+<div class="feed-tabs mb-3">
+    <span class="feed-tab feed-tab-active">новости</span>
+    <span class="feed-tab">все подряд</span>
+    <span class="feed-tab">лучшие</span>
+</div>
+<form method="get" action="" class="search-form">
     <div class="input-group">
         <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Поиск по статьям...">
+        <select name="category" class="form-control category-select">
+            <option value="">Все категории</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
         <button class="btn btn-outline-secondary" type="submit">Найти</button>
     </div>
 </form>
+<div class="habr-feed-block">
 {% if query %}
-    <h4>Результаты поиска</h4>
+    <h4 class="feed-title">Результаты поиска</h4>
     {% for article in search_results %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5><a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a></h5>
-                <p class="text-muted">Категория: {{ article.category }} | Автор: {{ article.author.username }} | {{ article.pub_date|date:'d.m.Y H:i' }}</p>
-                <p>
-                    {% if article.text|length > 200 %}
-                        {{ article.text|truncatechars:200 }} <a href="{% url 'blog:article_detail' article.pk %}">Читать далее</a>
-                    {% else %}
-                        {{ article.text }}
-                    {% endif %}
-                </p>
+        <article class="habr-feed-item">
+            <h3 class="habr-feed-item-title">
+                <a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a>
+            </h3>
+            <div class="habr-feed-item-meta">
+                <span>{{ article.pub_date|date:'H:i' }}</span>
+                <span>💬 0</span>
             </div>
-        </div>
+        </article>
     {% empty %}
-        <p>Ничего не найдено.</p>
+        <div class="empty-state">Ничего не найдено. Попробуйте другой запрос.</div>
     {% endfor %}
 {% else %}
-    <h4>Последние статьи</h4>
+    <h4 class="feed-title">Лента публикаций</h4>
     {% for article in latest_articles %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5><a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a></h5>
-                <p class="text-muted">Категория: {{ article.category }} | Автор: {{ article.author.username }} | {{ article.pub_date|date:'d.m.Y H:i' }}</p>
-                <p>
-                    {% if article.text|length > 200 %}
-                        {{ article.text|truncatechars:200 }} <a href="{% url 'blog:article_detail' article.pk %}">Читать далее</a>
-                    {% else %}
-                        {{ article.text }}
-                    {% endif %}
-                </p>
+        <article class="habr-feed-item">
+            <h3 class="habr-feed-item-title">
+                <a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a>
+            </h3>
+            <div class="habr-feed-item-meta">
+                <span>{{ article.pub_date|date:'H:i' }}</span>
+                <span>💬 0</span>
             </div>
-        </div>
+        </article>
     {% empty %}
-        <p>Нет статей.</p>
+        <div class="empty-state">Пока нет опубликованных статей.</div>
     {% endfor %}
 {% endif %}
+{% if latest_articles or search_results %}
+    <a class="show-more-link" href="{% url 'blog:article_list' %}">Показать еще</a>
+{% endif %}
+</div>
 {% endblock %} 

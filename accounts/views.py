@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.db.models import Sum
 from .forms import UserRegisterForm, UserLoginForm, ProfileForm
 from .models import Profile
-from django.contrib.auth.models import User
+from blog.models import Article
 
 def register_view(request):
     if request.method == 'POST':
@@ -29,18 +31,31 @@ def login_view(request):
         form = UserLoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
+@require_POST
 def logout_view(request):
     logout(request)
     return redirect('core:home')
 
 @login_required
 def profile_view(request):
-    profile = request.user.profile
-    return render(request, 'accounts/profile.html', {'profile': profile})
+    profile, _ = Profile.objects.get_or_create(user=request.user)
+    user_articles = Article.objects.filter(author=request.user).order_by('-pub_date')
+    published_count = user_articles.filter(published=True).count()
+    drafts_count = user_articles.filter(published=False).count()
+    total_views = user_articles.aggregate(total=Sum('views'))['total'] or 0
+    recent_articles = user_articles[:5]
+
+    return render(request, 'accounts/profile.html', {
+        'profile': profile,
+        'published_count': published_count,
+        'drafts_count': drafts_count,
+        'total_views': total_views,
+        'recent_articles': recent_articles,
+    })
 
 @login_required
 def profile_edit_view(request):
-    profile = request.user.profile
+    profile, _ = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():

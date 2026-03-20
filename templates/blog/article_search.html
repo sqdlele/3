@@ -2,18 +2,26 @@
 {% block title %}Поиск{% endblock %}
 {% block content %}
 <h2>Результаты поиска</h2>
-<form method="get" action="{% url 'blog:article_search' %}" class="mb-3">
+<form method="get" action="{% url 'blog:article_search' %}" class="search-form">
     <div class="input-group">
         <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Поиск...">
+        <select name="category" class="form-control category-select">
+            <option value="">Все категории</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
         <button class="btn btn-outline-secondary" type="submit">Найти</button>
     </div>
 </form>
 {% for article in articles %}
-    <div class="card mb-3">
+    <div class="card card-hover mb-3">
         <div class="card-body">
             <h4><a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a></h4>
-            <p class="text-muted">Категория: {{ article.category }} | Автор: {{ article.author.username }} | {{ article.pub_date|date:'d.m.Y H:i' }}</p>
-            <p>
+            <p class="text-muted article-meta">Категория: {{ article.category }} | Автор: {{ article.author.username }} | {{ article.pub_date|date:'d.m.Y H:i' }}</p>
+            <p class="article-text">
                 {% if article.text|length > 300 %}
                     {{ article.text|truncatechars:300 }} <a href="{% url 'blog:article_detail' article.pk %}">Читать далее</a>
                 {% else %}
@@ -23,7 +31,7 @@
         </div>
     </div>
 {% empty %}
-    <p>Ничего не найдено.</p>
+    <div class="empty-state">Ничего не найдено. Уточните запрос.</div>
 {% endfor %}
 <a href="{% url 'blog:article_list' %}" class="btn btn-secondary">Назад к статьям</a>
 {% endblock %} 

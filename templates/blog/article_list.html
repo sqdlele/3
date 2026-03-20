@@ -1,29 +1,45 @@
 {% extends 'base.html' %}
 {% block title %}Статьи{% endblock %}
 {% block content %}
-<h2>Статьи</h2>
-{% if user.is_authenticated %}
-    <a href="{% url 'blog:article_create' %}" class="btn btn-success mb-3">Создать статью</a>
-{% endif %}
-<form method="get" action="{% url 'blog:article_search' %}" class="mb-3">
+<div class="page-header">
+    <h2>Статьи</h2>
+    {% if user.is_authenticated %}
+        <a href="{% url 'blog:article_create' %}" class="btn btn-success">Создать статью</a>
+    {% endif %}
+</div>
+<form method="get" action="{% url 'blog:article_search' %}" class="search-form">
     <div class="input-group">
         <input type="text" name="q" class="form-control" placeholder="Поиск...">
+        <select name="category" class="form-control category-select">
+            <option value="">Все категории</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
         <button class="btn btn-outline-secondary" type="submit">Найти</button>
     </div>
 </form>
+<div class="category-pills mb-3">
+    <a href="{% url 'blog:article_list' %}" class="category-pill {% if not selected_category %}category-pill-active{% endif %}">Все</a>
+    {% for category in categories %}
+        <a href="{% url 'blog:article_list' %}?category={{ category.id }}" class="category-pill {% if selected_category == category.id|stringformat:'s' %}category-pill-active{% endif %}">{{ category.name }}</a>
+    {% endfor %}
+</div>
 {% for article in articles %}
-    <div class="card mb-3">
+    <div class="card card-hover mb-3">
         <div class="card-body">
             <h4><a href="{% url 'blog:article_detail' article.pk %}">{{ article.title }}</a></h4>
-            <p class="text-muted">Категория: {{ article.category }} | Автор: {{ article.author.username }} | {{ article.pub_date|date:'d.m.Y H:i' }}</p>
-            <p>
+            <p class="text-muted article-meta">Категория: {{ article.category }} | Автор: {{ article.author.username }} | {{ article.pub_date|date:'d.m.Y H:i' }}</p>
+            <p class="article-text">
                 {% if article.text|length > 300 %}
                     {{ article.text|truncatechars:300 }} <a href="{% url 'blog:article_detail' article.pk %}">Читать далее</a>
                 {% else %}
                     {{ article.text }}
                 {% endif %}
             </p>
-            <div>
+            <div class="chip-row">
                 <b>Теги:</b>
                 {% for tag in article.tags.all %}
                     <span class="badge bg-secondary">{{ tag.name }}</span>
@@ -36,6 +52,6 @@
         </div>
     </div>
 {% empty %}
-    <p>Нет статей.</p>
+    <div class="empty-state">Нет статей. Создайте первую публикацию.</div>
 {% endfor %}
 {% endblock %} 

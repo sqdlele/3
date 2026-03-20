@@ -1,21 +1,30 @@
 <!DOCTYPE html>
 <html lang="ru">
   <head>
+    {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Блог-платформа{% endblock %}</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
     {% block extra_head %}{% endblock %}
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <nav class="navbar mb-4">
       <div class="container">
         <a class="navbar-brand" href="/">Блог</a>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav ms-auto">
+        <div class="navbar-links">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'blog:article_list' %}">Статьи</a>
+            </li>
+            {% if is_admin_nav %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'blog:category_list' %}">Категории</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'blog:tag_list' %}">Теги</a>
+            </li>
+            {% endif %}
             {% if user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'accounts:profile' %}"
@@ -23,7 +32,10 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'accounts:logout' %}">Выйти</a>
+              <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">
+                {% csrf_token %}
+                <button type="submit" class="nav-link nav-link-button">Выйти</button>
+              </form>
             </li>
             {% else %}
             <li class="nav-item">
@@ -39,11 +51,16 @@
         </div>
       </div>
     </nav>
-    <div class="container">
-      {% if messages %} {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-      {% endfor %} {% endif %} {% block content %}{% endblock %}
-    </div>
+    <main class="content-wrap">
+      <div class="container">
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% block content %}{% endblock %}
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container">Блог-платформа на Django</div>
+    </footer>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
