@@ -4,18 +4,21 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Блог-платформа{% endblock %}</title>
+    <title>{% block title %}Универсальная платформа{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/app.css' %}" />
     {% block extra_head %}{% endblock %}
   </head>
   <body>
     <nav class="navbar mb-4">
       <div class="container">
-        <a class="navbar-brand" href="/">Блог</a>
+        <a class="navbar-brand" href="/">Платформа</a>
         <div class="navbar-links">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'blog:article_list' %}">Статьи</a>
+              <a class="nav-link" href="{% url 'blog:article_list' %}">Материалы</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:about' %}">О нас</a>
             </li>
             {% if is_admin_nav %}
             <li class="nav-item">
@@ -59,7 +62,7 @@
       </div>
     </main>
     <footer class="site-footer">
-      <div class="container">Блог-платформа на Django</div>
+      <div class="container">Универсальный шаблон платформы на Django</div>
     </footer>
     {% block extra_js %}{% endblock %}
   </body>

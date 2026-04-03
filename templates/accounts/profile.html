@@ -30,6 +30,13 @@
             <li class="list-group-item"><b>Имя:</b> {{ profile.first_name|default:'—' }}</li>
             <li class="list-group-item"><b>Фамилия:</b> {{ profile.last_name|default:'—' }}</li>
             <li class="list-group-item"><b>Email:</b> {{ profile.user.email|default:'—' }}</li>
+            <li class="list-group-item"><b>Локация:</b> {{ profile.location|default:'—' }}</li>
+            <li class="list-group-item"><b>Сайт:</b>
+                {% if profile.website %}
+                    <a href="{{ profile.website }}" target="_blank" rel="noopener noreferrer">{{ profile.website }}</a>
+                {% else %}—{% endif %}
+            </li>
+            <li class="list-group-item"><b>О себе:</b> {{ profile.bio|default:'—' }}</li>
             <li class="list-group-item"><b>Контакты:</b> {{ profile.contact_info|default:'—' }}</li>
         </ul>
     </div>

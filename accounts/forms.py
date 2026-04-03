@@ -18,7 +18,6 @@ class UserRegisterForm(UserCreationForm):
         self.fields['password1'].label = 'Пароль'
         self.fields['password2'].label = 'Подтверждение пароля'
 
-        # Do not show long validator texts before user interaction.
         self.fields['username'].help_text = ''
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
@@ -32,18 +31,38 @@ class UserLoginForm(AuthenticationForm):
     username = forms.CharField(label='Username')
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Логин'
+        self.fields['email'].label = 'Email'
+        self.fields['username'].widget.attrs.update({'placeholder': 'Введите логин'})
+        self.fields['email'].widget.attrs.update({'placeholder': 'Введите email'})
+
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'avatar', 'contact_info'] 
+        fields = ['first_name', 'last_name', 'avatar', 'bio', 'location', 'website', 'contact_info']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['first_name'].label = 'Имя'
         self.fields['last_name'].label = 'Фамилия'
         self.fields['avatar'].label = 'Аватар'
+        self.fields['bio'].label = 'О себе'
+        self.fields['location'].label = 'Город / Локация'
+        self.fields['website'].label = 'Сайт'
         self.fields['contact_info'].label = 'Контакты'
 
         self.fields['first_name'].widget.attrs.update({'placeholder': 'Введите имя'})
         self.fields['last_name'].widget.attrs.update({'placeholder': 'Введите фамилию'})
+        self.fields['bio'].widget.attrs.update({'placeholder': 'Кратко расскажите о себе'})
+        self.fields['location'].widget.attrs.update({'placeholder': 'Например: Москва'})
+        self.fields['website'].widget.attrs.update({'placeholder': 'https://example.com'})
         self.fields['contact_info'].widget.attrs.update({'placeholder': 'Телефон, Telegram, сайт и т.д.'})

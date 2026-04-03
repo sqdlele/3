@@ -2,13 +2,13 @@
 {% block title %}Главная{% endblock %}
 {% block content %}
 <div class="feed-tabs mb-3">
-    <span class="feed-tab feed-tab-active">новости</span>
-    <span class="feed-tab">все подряд</span>
-    <span class="feed-tab">лучшие</span>
+    <span class="feed-tab feed-tab-active">обзор</span>
+    <span class="feed-tab">новые</span>
+    <span class="feed-tab">популярные</span>
 </div>
 <form method="get" action="" class="search-form">
     <div class="input-group">
-        <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Поиск по статьям...">
+        <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Поиск по материалам...">
         <select name="category" class="form-control category-select">
             <option value="">Все категории</option>
             {% for category in categories %}
@@ -37,7 +37,7 @@
         <div class="empty-state">Ничего не найдено. Попробуйте другой запрос.</div>
     {% endfor %}
 {% else %}
-    <h4 class="feed-title">Лента публикаций</h4>
+    <h4 class="feed-title">Лента материалов</h4>
     {% for article in latest_articles %}
         <article class="habr-feed-item">
             <h3 class="habr-feed-item-title">
@@ -49,11 +49,34 @@
             </div>
         </article>
     {% empty %}
-        <div class="empty-state">Пока нет опубликованных статей.</div>
+        <div class="empty-state">Пока нет опубликованных материалов.</div>
     {% endfor %}
 {% endif %}
 {% if latest_articles or search_results %}
-    <a class="show-more-link" href="{% url 'blog:article_list' %}">Показать еще</a>
+    <a class="show-more-link" href="{% url 'blog:article_list' %}">Показать больше</a>
 {% endif %}
 </div>
+
+{% if home_blocks %}
+<div class="dynamic-blocks">
+    {% for block in home_blocks %}
+    <section class="card mb-3">
+        <div class="card-body dynamic-block">
+            {% if block.image %}
+                <img src="{{ block.image.url }}" alt="{{ block.title }}" class="dynamic-block-image">
+            {% endif %}
+            <div>
+                <h4 class="mb-3">{{ block.title }}</h4>
+                {% if block.description %}
+                    <p class="text-muted">{{ block.description }}</p>
+                {% endif %}
+                {% if block.button_text and block.button_link %}
+                    <a href="{{ block.button_link }}" class="btn btn-primary">{{ block.button_text }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+</div>
+{% endif %}
 {% endblock %} 

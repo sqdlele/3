@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Sum
-from .forms import UserRegisterForm, UserLoginForm, ProfileForm
+from .forms import UserRegisterForm, UserLoginForm, ProfileForm, UserProfileUpdateForm
 from .models import Profile
 from blog.models import Article
 
@@ -57,11 +57,17 @@ def profile_view(request):
 def profile_edit_view(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
+        user_form = UserProfileUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
             messages.success(request, 'Профиль обновлен!')
             return redirect('accounts:profile')
     else:
-        form = ProfileForm(instance=profile)
-    return render(request, 'accounts/profile_edit.html', {'form': form})
+        user_form = UserProfileUpdateForm(instance=request.user)
+        profile_form = ProfileForm(instance=profile)
+    return render(request, 'accounts/profile_edit.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })

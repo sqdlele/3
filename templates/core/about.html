@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}О нас{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h2>{{ about_page.title|default:'О нас' }}</h2>
+    <p class="page-subtitle">
+      {{ about_page.intro|default:'Мы развиваем универсальные проекты и сервисы под разные задачи.' }}
+    </p>
+
+    <h4>{{ about_page.mission_title|default:'Наша миссия' }}</h4>
+    <p>{{ about_page.mission_text|default:'Создавать полезные и понятные продукты.' }}</p>
+    <h4>{{ about_page.values_title|default:'Наши принципы' }}</h4>
+    <p>{{ about_page.values_text|default:'Качество, прозрачность и удобство.' }}</p>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h4 class="mb-3">Наша команда</h4>
+    {% if team_members %}
+      <div class="team-grid">
+        {% for member in team_members %}
+        <article class="team-card">
+          {% if member.photo %}
+            <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" class="team-photo">
+          {% endif %}
+          <h5>{{ member.full_name }}</h5>
+          <p class="text-muted">{{ member.role }}</p>
+          {% if member.bio %}
+            <p>{{ member.bio }}</p>
+          {% endif %}
+        </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">Добавьте участников команды в админке.</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h4 class="mb-3">Фотографии места</h4>
+    {% if gallery_images %}
+      <div class="gallery-grid">
+        {% for item in gallery_images %}
+        <figure class="gallery-item">
+          <img src="{{ item.image.url }}" alt="{{ item.title|default:'Фото' }}" class="gallery-image">
+          {% if item.title %}
+            <figcaption class="text-muted">{{ item.title }}</figcaption>
+          {% endif %}
+        </figure>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">Добавьте фотографии в админке.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
